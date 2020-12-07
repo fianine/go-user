@@ -30,7 +30,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	response.Status = 1
+	response.Status = true
 	response.Message = "Success"
 	response.Data = getUsers
 
@@ -62,8 +62,8 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	response.Status = 1
-	response.Message = "Success Add"
+	response.Status = true
+	response.Message = "Successfully added"
 	log.Print("Insert data to database")
 
 	w.Header().Set("Content-Type", "application/json")
@@ -96,8 +96,8 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	response.Status = 1
-	response.Message = "Success Update Data"
+	response.Status = true
+	response.Message = "Successfully Updated"
 	log.Print("Update data to database")
 
 	w.Header().Set("Content-Type", "application/json")
@@ -126,8 +126,8 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	response.Status = 1
-	response.Message = "Success Delete Data"
+	response.Status = true
+	response.Message = "Successufully Deleted"
 	log.Print("Delete data to database")
 
 	w.Header().Set("Content-Type", "application/json")
