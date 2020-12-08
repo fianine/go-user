@@ -17,7 +17,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	connection, err := config.ConnectSQL()
 	defer connection.SQL.Close()
 
-	rows, err := connection.SQL.Query("SELECT id, first_name, last_name FROM person")
+	rows, err := connection.SQL.Query("SELECT id, first_name, last_name FROM users")
 	if err != nil {
 		log.Print(err)
 	}
@@ -53,7 +53,7 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 	firstName := r.FormValue("first_name")
 	lastName := r.FormValue("last_name")
 
-	_, err = connection.SQL.Exec("INSERT INTO person (first_name, last_name) values (?,?)",
+	_, err = connection.SQL.Exec("INSERT INTO users (first_name, last_name) values (?,?)",
 		firstName,
 		lastName,
 	)
@@ -86,7 +86,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	firstName := r.FormValue("first_name")
 	lastName := r.FormValue("last_name")
 
-	_, err = connection.SQL.Exec("UPDATE person SET first_name = ?, last_name = ? WHERE id = ?",
+	_, err = connection.SQL.Exec("UPDATE users SET first_name = ?, last_name = ? WHERE id = ?",
 		firstName,
 		lastName,
 		id,
@@ -118,7 +118,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	id := r.FormValue("user_id")
 
-	_, err = connection.SQL.Exec("DELETE from person WHERE id = ?",
+	_, err = connection.SQL.Exec("DELETE from users WHERE id = ?",
 		id,
 	)
 
