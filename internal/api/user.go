@@ -1,47 +1,42 @@
 package api
 
 import (
-	"encoding/json"
 	"go-user/internal/database/config"
 	"go-user/internal/model"
+	"go-user/internal/service"
 	"log"
 	"net/http"
 )
 
 // Get Users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	var users model.Users
-	var getUsers []model.Users
-	var response model.Response
-
 	connection, err := config.ConnectSQL()
 	defer connection.SQL.Close()
 
-	rows, err := connection.SQL.Query("SELECT id, first_name, last_name FROM users")
+	var users []model.Model
+	rows, err := connection.SQL.Query("SELECT * FROM users")
 	if err != nil {
-		log.Print(err)
+		panic(err)
 	}
 
 	for rows.Next() {
-		if err := rows.Scan(&users.ID, &users.FirstName, &users.LastName); err != nil {
-			log.Fatal(err.Error())
-		} else {
-			getUsers = append(getUsers, users)
-		}
+		var user model.User
+		rows.Scan(&user.ID, &user.FirstName, &user.LastName)
+
+		users = append(users, user)
 	}
 
-	response.Status = true
-	response.Message = "Success"
-	response.Data = getUsers
+	response := model.Response{
+		Status:  200,
+		Message: "Success",
+		Data:    users,
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	responseWithJson(w, response)
 }
 
 // Add New User
 func AddUser(w http.ResponseWriter, r *http.Request) {
-	var response model.Response
-
 	connection, err := config.ConnectSQL()
 	defer connection.SQL.Close()
 
@@ -62,18 +57,16 @@ func AddUser(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	response.Status = true
-	response.Message = "Successfully added"
-	log.Print("Insert data to database")
+	response := model.Response{
+		Status:  201,
+		Message: "Success",
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	responseWithJson(w, response)
 }
 
 // Update User
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	var response model.Response
-
 	connection, err := config.ConnectSQL()
 	defer connection.SQL.Close()
 
@@ -96,18 +89,16 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	response.Status = true
-	response.Message = "Successfully Updated"
-	log.Print("Update data to database")
+	response := model.Response{
+		Status:  201,
+		Message: "Success",
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	responseWithJson(w, response)
 }
 
 // Delete User
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	var response model.Response
-
 	connection, err := config.ConnectSQL()
 	defer connection.SQL.Close()
 
@@ -126,10 +117,39 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 	}
 
-	response.Status = true
-	response.Message = "Successufully Deleted"
-	log.Print("Delete data to database")
+	response := model.Response{
+		Status:  201,
+		Message: "Success",
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	responseWithJson(w, response)
+}
+
+// User with address
+func UserAddress(w http.ResponseWriter, r *http.Request) {
+	connection, _ := config.ConnectSQL()
+	defer connection.SQL.Close()
+
+	userID := r.URL.Query().Get("userID")
+
+	row := connection.SQL.QueryRow("SELECT * FROM users WHERE id = ?", userID)
+
+	var user model.User
+	err := row.Scan(&user.ID, &user.FirstName, &user.LastName)
+	if err != nil {
+		responseWithJson(w, model.Response{
+			Status:  404,
+			Message: "Not found",
+			Data:    []model.Model{},
+		})
+		return
+	}
+
+	user.Addresses, _ = service.GetAddressUser(user.ID)
+
+	responseWithJson(w, model.Response{
+		Status:  200,
+		Message: "ok",
+		Data:    []model.Model{user},
+	})
 }

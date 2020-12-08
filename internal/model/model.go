@@ -1,15 +1,10 @@
 package model
 
-// Users struct
-type Users struct {
-	ID        string `form:"id" json:"id"`
-	FirstName string `form:"firstname" json:"firstname"`
-	LastName  string `form:"lastname" json:"lastname"`
-}
+type Model interface{}
 
 // Response struct
 type Response struct {
-	Status  bool   `json:"status"`
+	Status  int    `json:"status"`
 	Message string `json:"message"`
-	Data    []Users
+	Data    []Model
 }
