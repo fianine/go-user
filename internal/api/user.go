@@ -1,7 +1,7 @@
 package api
 
 import (
-	"encoding/json"
+	"fmt"
 	"go-user/internal/database/config"
 	"go-user/internal/model"
 	"go-user/internal/service"
@@ -189,9 +189,7 @@ func AddUserAddress(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 
-	var result map[string]interface{}
-
-	json.NewDecoder(resp.Body).Decode(&result)
+	fmt.Println(resp)
 
 	responseWithJson(w, model.Response{
 		Status:  201,
