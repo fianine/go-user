@@ -123,7 +123,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := model.Response{
-		Status:  204,
+		Status:  201,
 		Message: "Success",
 	}
 
@@ -182,6 +182,76 @@ func AddUserAddress(w http.ResponseWriter, r *http.Request) {
 		"address":  {address},
 		"city":     {city},
 		"province": {province},
+	}
+
+	resp, err := http.PostForm(addressService, formData)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println(resp)
+
+	responseWithJson(w, model.Response{
+		Status:  201,
+		Message: "Success",
+	})
+}
+
+func UpdateUserAddress(w http.ResponseWriter, r *http.Request) {
+	errEnv := godotenv.Load(".env")
+	if errEnv != nil {
+		log.Fatalf("Load env failed")
+	}
+
+	addressService := os.Getenv("ADDRESS_SERVICE") + "/update_user_address"
+
+	parseErr := r.ParseForm()
+	if parseErr != nil {
+		panic(parseErr)
+	}
+
+	userID := r.Form.Get("user_id")
+	address := r.Form.Get("address")
+	city := r.Form.Get("city")
+	province := r.Form.Get("province")
+
+	formData := url.Values{
+		"user_id":  {userID},
+		"address":  {address},
+		"city":     {city},
+		"province": {province},
+	}
+
+	resp, err := http.PostForm(addressService, formData)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println(resp)
+
+	responseWithJson(w, model.Response{
+		Status:  201,
+		Message: "Success",
+	})
+}
+
+func DeleteUserAddress(w http.ResponseWriter, r *http.Request) {
+	errEnv := godotenv.Load(".env")
+	if errEnv != nil {
+		log.Fatalf("Load env failed")
+	}
+
+	addressService := os.Getenv("ADDRESS_SERVICE") + "/delete_user_address"
+
+	parseErr := r.ParseForm()
+	if parseErr != nil {
+		panic(parseErr)
+	}
+
+	userID := r.Form.Get("user_id")
+
+	formData := url.Values{
+		"user_id": {userID},
 	}
 
 	resp, err := http.PostForm(addressService, formData)
